@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Bujumbura Data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<style>
+    .header {
+        background-color: darkslategray;
+        height: 50px;
+        text-align: center;
+        font-size: 30px;
+        color: white;
+    }
+
+    .card-header-d {
+        background-color: white;
+    }
+
+    .city-history {
+        margin: 10px;
+        margin-top: 40px;
+        border-style: solid 1px grey;
+    }
+
+    .forcast-day {
+        background: darkslateblue;
+        color: white;
+        width: 200px;
+        text-align: center;
+        border-radius: 25px;
+    }
+</style>
+
+<body>
+    <div class="header jumbotron">Weather Dashboard</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card card-user">
+                    <div class="card-header card-header-user">
+                    </div>
+                    <div class="card-body card-body-user">
+                        <!-- <form class="user-input"> -->
+                        <input class="user-city">
+                        <button class="city-search-btn">Search</button>
+                        <button class="clear-history">Clear Cities</button>
+                        <!-- </form> -->
+                        <div class="card-header city-history"></div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card card-details">
+                    <div class="card-header card-header-d">
+                        <h3 class="card-header-details"></h3>
+                        <div class="weather-icon"></div>
+                    </div>
+                    <div class="card-body card-body-details">
+                        <p class="temp"></p>
+                        <p class="humidity"></p>
+                        <p class="wind"></p>
+                        <p class="uv"></p>
+                    </div>
+
+
+                </div>
+                <div class="card card-forcast">
+                    <div class="card-header card-header-forcast">5 Day Forcast
+                        <div class="card-body card-body-forcast">
+                            <div class="forcast-day day-1">
+                                <p class="day-1-date"></p>
+                                <img class="day-1-image">
+                                <p class="day-1-temp"></p>
+                                <p class="day-1-humidity"></p>
+
+                            </div>
+                            <div class="day-2"></div>
+                            <div class="day-3"></div>
+                            <div class="day-4"></div>
+                            <div class="day-5"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"
+        integrity="sha256-H9jAz//QLkDOy/nzE9G4aYijQtkLt9FvGmdUTwBk6gs=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        // This is our API key. Add your own API key between the ""
+        var index = 0;
+        $(document).ready(function () {
+
+
+            var APIKey = "8dadfc0155258003c4e809e37b47eda7";
+            var city;
+            // may not need the cities array.....except to figure out whether the city needs to be added again....
+            var citiesArray = [];
+            // varable that i might not need to get the storage?????
+            // var historyArray = localStorage.getItem("City History");
+
+            console.log("index original: " + index);
+
+            var indexForHistory = localStorage.getItem("Storage Index"); ///possible that it will need to be fixed to not be zero.
+            console.log(indexForHistory);
+
+            if (indexForHistory >= 0) {
+                index = index + Number(indexForHistory);
+
+                //loop to set up the tabs
+                for (var i = 0; i <= index; i++) {
+                    var newDiv = $("<p>");
+                    console.log("toString: " + i);
+                    var citySearchHistory = localStorage.getItem("City " + i);
+                    newDiv.text(citySearchHistory);
+                    newDiv.addClass("city-history-button");
+                    $(".city-history").append(newDiv);
+                }
+            }
+
+
+            //====================================on click function!================================//
+            $(".city-search-btn").on("click", function () {
+                city = $(".user-city").val();
+                console.log('setting index ~~~~', index)
+                // put array here that will check the input
+
+                citiesArray.push(city);
+                //city to lowercase
+                //if city isnt' in the array already aka returns as -1
+                localStorage.setItem("City " + index, city);
+
+                index++;
+                localStorage.setItem("Storage Index", index);
+
+                // index = index.toString();
+                // console.log("index: " + index + " is integer? " + Number.isInteger(index));
+                // storageIndex++;
+
+
+                var newDiv = $("<p>");
+                newDiv.addClass("city-history-button");
+                newDiv.text(city);
+                $(".city-history").append(newDiv);
+
+                var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
+
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+
+                    // Create CODE HERE to Log the queryURL
+
+                    // Create CODE HERE to log the resulting object
+                    console.log(response);
+
+                    // Create CODE HERE to transfer content to HTML
+
+                    $(".card-header-details").text(city + " (" + moment().format('L') + ")");
+                    // $(".weather-icon").text(response.weather.icon);
+                    $(".temp").text("Temperature: " + response.main.temp + " F");
+                    $(".humidity").text("Humidity: " + response.main.humidity + "%");
+                    $(".wind").text("Wind Speed: " + response.wind.speed + " MPH");
+
+                    $(".weather-icon").empty();
+                    var imgDiv = $("<img>");
+                    imgDiv.attr("src", "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png")
+                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
+                    $(".weather-icon").append(imgDiv);
+
+                    var long = response.coord.lon;
+                    var lat = response.coord.lat;
+                    console.log("long: " + long + " lat: " + lat);
+
+                    //=====uv index====//
+                    // var uvDate = "2020-02-05T15:04:05Z"
+                    // var uvquery = "http://api.openweathermap.org/v3/uvi/" + lat + "," + long + "/" + uvDate + ".json?appid=" + "8dadfc0155258003c4e809e37b47eda7";
+                    // console.log(uvquery);
+
+                    var uvquery = "http://api.openweathermap.org/data/2.5/uvi?appid=8dadfc0155258003c4e809e37b47eda7&lat=" + lat + "&lon=" + long;
+
+                    $.ajax({
+                        url: uvquery,
+                        method: "GET",
+                    }).then(function (response) {
+                        console.log(response.value);
+                        $(".uv").text("UV Index: " + response.value);
+                        // var uvVariable = Math.floor(response.value);
+                        // console.log(uvVariable);
+                        if (response.value > 6) {
+                            $(".uv").css("background-color", "red");
+                        }
+                        else if (response.value < 4) {
+                            $(".uv").css("background-color", "lightblue");
+                        }
+                        else {
+                            $(".uv").css("background-color", "orange");
+                        }
+                    });
+
+                });
+
+                var forcastquery = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + APIKey;
+                $.ajax({
+                    url: forcastquery,
+                    method: "GET",
+                }).then(function (response) {
+                    console.log(response);
+                    $(".day-1-date").text(response.list[3].dt_txt);
+
+                    console.log("icon: " + response.list[0].weather[0].icon);
+
+                    $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
+                    $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
+
+                    // var imgDiv = $("<img>");
+                    $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
+                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
+                    // $(".day-1-image").append(imgDiv);
+                });
+            });
+            //=====================on click function=================//
+            $(".clear-history").on("click", function () {
+                localStorage.clear();
+                $(".city-history").empty();
+
+            });
+            $(".city-history-button").on("click", function () {
+                var city = $(this).html();
+
+                localStorage.setItem("City " + index, city);
+
+                index++;
+                localStorage.setItem("Storage Index", index);
+
+                // index = index.toString();
+                // console.log("index: " + index + " is integer? " + Number.isInteger(index));
+                // storageIndex++;
+
+
+                var newDiv = $("<p>");
+                newDiv.addClass("city-history-button");
+                newDiv.text(city);
+                $(".city-history").append(newDiv);
+
+                var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
+
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+
+                    // Create CODE HERE to Log the queryURL
+
+                    // Create CODE HERE to log the resulting object
+                    console.log(response);
+
+                    // Create CODE HERE to transfer content to HTML
+
+                    $(".card-header-details").text(city + " (" + moment().format('L') + ")");
+                    // $(".weather-icon").text(response.weather.icon);
+                    $(".temp").text("Temperature: " + response.main.temp + " F");
+                    $(".humidity").text("Humidity: " + response.main.humidity + "%");
+                    $(".wind").text("Wind Speed: " + response.wind.speed + " MPH");
+
+                    $(".weather-icon").empty();
+                    var imgDiv = $("<img>");
+                    imgDiv.attr("src", "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png")
+                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
+                    $(".weather-icon").append(imgDiv);
+
+                    var long = response.coord.lon;
+                    var lat = response.coord.lat;
+                    console.log("long: " + long + " lat: " + lat);
+
+                    //=====uv index====//
+                    // var uvDate = "2020-02-05T15:04:05Z"
+                    // var uvquery = "http://api.openweathermap.org/v3/uvi/" + lat + "," + long + "/" + uvDate + ".json?appid=" + "8dadfc0155258003c4e809e37b47eda7";
+                    // console.log(uvquery);
+
+                    var uvquery = "http://api.openweathermap.org/data/2.5/uvi?appid=8dadfc0155258003c4e809e37b47eda7&lat=" + lat + "&lon=" + long;
+
+                    $.ajax({
+                        url: uvquery,
+                        method: "GET",
+                    }).then(function (response) {
+                        console.log(response.value);
+                        $(".uv").text("UV Index: " + response.value);
+                        // var uvVariable = Math.floor(response.value);
+                        // console.log(uvVariable);
+                        if (response.value > 6) {
+                            $(".uv").css("background-color", "red");
+                        }
+                        else if (response.value < 4) {
+                            $(".uv").css("background-color", "lightblue");
+                        }
+                        else {
+                            $(".uv").css("background-color", "orange");
+                        }
+                    });
+
+                });
+
+                var forcastquery = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + APIKey;
+                $.ajax({
+                    url: forcastquery,
+                    method: "GET",
+                }).then(function (response) {
+                    console.log(response);
+                    $(".day-1-date").text(response.list[3].dt_txt);
+
+                    console.log("icon: " + response.list[0].weather[0].icon);
+
+                    $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
+                    $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
+
+                    // var imgDiv = $("<img>");
+                    $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
+                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
+                    // $(".day-1-image").append(imgDiv);
+                });
+            });
+
+        });
+        // });
+
+    //   // Create CODE HERE to calculate the temperature (converted from Kelvin)
+    //   // Hint: To convert from Kelvin to Fahrenheit: F = (K - 273.15) * 1.80 + 32
+    //   // Create CODE HERE to dump the temperature content into HTML
+
+    // });
+    </script>
+</body>
+
+</html>
