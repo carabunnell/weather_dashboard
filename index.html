@@ -32,6 +32,8 @@
         width: 200px;
         text-align: center;
         border-radius: 25px;
+        float: left;
+        margin: 2px;
     }
 </style>
 
@@ -49,7 +51,7 @@
                         <button class="city-search-btn">Search</button>
                         <button class="clear-history">Clear Cities</button>
                         <!-- </form> -->
-                        <div class="card-header city-history"></div>
+                        <div class="city-history"></div>
                     </div>
 
                 </div>
@@ -58,7 +60,7 @@
                 <div class="card card-details">
                     <div class="card-header card-header-d">
                         <h3 class="card-header-details"></h3>
-                        <div class="weather-icon"></div>
+                        <img class="weather-icon"></img>
                     </div>
                     <div class="card-body card-body-details">
                         <p class="temp"></p>
@@ -72,17 +74,42 @@
                 <div class="card card-forcast">
                     <div class="card-header card-header-forcast">5 Day Forcast
                         <div class="card-body card-body-forcast">
+
+                            <div class="forcast-day day-0">
+                                <p class="day-0-date"></p>
+                                <img class="day-0-image">
+                                <p class="day-0-temp"></p>
+                                <p class="day-0-humidity"></p>
+                            </div>
+
                             <div class="forcast-day day-1">
                                 <p class="day-1-date"></p>
                                 <img class="day-1-image">
                                 <p class="day-1-temp"></p>
                                 <p class="day-1-humidity"></p>
-
                             </div>
-                            <div class="day-2"></div>
-                            <div class="day-3"></div>
-                            <div class="day-4"></div>
-                            <div class="day-5"></div>
+
+                            <div class="forcast-day day-2">
+                                <p class="day-2-date"></p>
+                                <img class="day-2-image">
+                                <p class="day-2-temp"></p>
+                                <p class="day-2-humidity"></p>
+                            </div>
+
+                            <div class="forcast-day day-3">
+                                <p class="day-3-date"></p>
+                                <img class="day-3-image">
+                                <p class="day-3-temp"></p>
+                                <p class="day-3-humidity"></p>
+                            </div>
+
+                            <div class="forcast-day day-4">
+                                <p class="day-4-date"></p>
+                                <img class="day-4-image">
+                                <p class="day-4-temp"></p>
+                                <p class="day-4-humidity"></p>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -103,24 +130,20 @@
 
             var APIKey = "8dadfc0155258003c4e809e37b47eda7";
             var city;
-            // may not need the cities array.....except to figure out whether the city needs to be added again....
             var citiesArray = [];
-            // varable that i might not need to get the storage?????
-            // var historyArray = localStorage.getItem("City History");
 
-            console.log("index original: " + index);
-
-            var indexForHistory = localStorage.getItem("Storage Index"); ///possible that it will need to be fixed to not be zero.
-            console.log(indexForHistory);
+            var indexForHistory = localStorage.getItem("Storage Index");
 
             if (indexForHistory >= 0) {
                 index = index + Number(indexForHistory);
 
                 //loop to set up the tabs
                 for (var i = 0; i <= index; i++) {
-                    var newDiv = $("<p>");
-                    console.log("toString: " + i);
+                    // var newDiv = $("<p>");
+                    // console.log("toString: " + i);
                     var citySearchHistory = localStorage.getItem("City " + i);
+                    //===========================possible function==============//
+                    var newDiv = $("<p>");
                     newDiv.text(citySearchHistory);
                     newDiv.addClass("city-history-button");
                     $(".city-history").append(newDiv);
@@ -131,27 +154,23 @@
             //====================================on click function!================================//
             $(".city-search-btn").on("click", function () {
                 city = $(".user-city").val();
-                console.log('setting index ~~~~', index)
-                // put array here that will check the input
 
-                citiesArray.push(city);
+                // console.log('setting index ~~~~', index)
+                // citiesArray.push(city);
                 //city to lowercase
                 //if city isnt' in the array already aka returns as -1
+                //=======function to add to local storage. pass in index and city.
                 localStorage.setItem("City " + index, city);
-
                 index++;
                 localStorage.setItem("Storage Index", index);
 
-                // index = index.toString();
-                // console.log("index: " + index + " is integer? " + Number.isInteger(index));
-                // storageIndex++;
-
-
+                //=========create new div========// pass in city, and class.or maybe not even the class, just the city
                 var newDiv = $("<p>");
                 newDiv.addClass("city-history-button");
                 newDiv.text(city);
                 $(".city-history").append(newDiv);
 
+                // ===========query url function============== // pass in url, the city and that's it
                 var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
 
                 $.ajax({
@@ -171,21 +190,12 @@
                     $(".temp").text("Temperature: " + response.main.temp + " F");
                     $(".humidity").text("Humidity: " + response.main.humidity + "%");
                     $(".wind").text("Wind Speed: " + response.wind.speed + " MPH");
-
-                    $(".weather-icon").empty();
-                    var imgDiv = $("<img>");
-                    imgDiv.attr("src", "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png")
+                    $(".weather-icon").attr("src", "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png")
                     // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
-                    $(".weather-icon").append(imgDiv);
-
+                    
+                    // UV RAYS QUERY
                     var long = response.coord.lon;
                     var lat = response.coord.lat;
-                    console.log("long: " + long + " lat: " + lat);
-
-                    //=====uv index====//
-                    // var uvDate = "2020-02-05T15:04:05Z"
-                    // var uvquery = "http://api.openweathermap.org/v3/uvi/" + lat + "," + long + "/" + uvDate + ".json?appid=" + "8dadfc0155258003c4e809e37b47eda7";
-                    // console.log(uvquery);
 
                     var uvquery = "http://api.openweathermap.org/data/2.5/uvi?appid=8dadfc0155258003c4e809e37b47eda7&lat=" + lat + "&lon=" + long;
 
@@ -193,10 +203,9 @@
                         url: uvquery,
                         method: "GET",
                     }).then(function (response) {
-                        console.log(response.value);
+                        console.log(response);
                         $(".uv").text("UV Index: " + response.value);
-                        // var uvVariable = Math.floor(response.value);
-                        // console.log(uvVariable);
+                        
                         if (response.value > 6) {
                             $(".uv").css("background-color", "red");
                         }
@@ -209,49 +218,50 @@
                     });
 
                 });
-
+                // FORCASTQUERY
                 var forcastquery = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + APIKey;
                 $.ajax({
                     url: forcastquery,
                     method: "GET",
                 }).then(function (response) {
                     console.log(response);
-                    $(".day-1-date").text(response.list[3].dt_txt);
 
-                    console.log("icon: " + response.list[0].weather[0].icon);
-
-                    $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
-                    $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
-
-                    // var imgDiv = $("<img>");
-                    $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
-                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
-                    // $(".day-1-image").append(imgDiv);
+                    var selection = 3;
+                    for (var i = 0; i < 5; i++) {
+                        i.toString();
+                        console.log("we did it: " + i);
+                        $(".day-" + i + "-date").text(response.list[selection].dt_txt);
+                        $(".day-" + i + "-temp").text("Temperature: " + response.list[selection].main.temp + " F");
+                        $(".day-" + i + "-humidity").text("Humidity: " + response.list[selection].main.humidity + "%");
+                        $(".day-" + i + "-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[selection].weather[0].icon + "@2x.png");
+                        selection = selection + 8;
+                    }
                 });
             });
             //=====================on click function=================//
             $(".clear-history").on("click", function () {
                 localStorage.clear();
                 $(".city-history").empty();
+                console.clear();
 
             });
             $(".city-history-button").on("click", function () {
                 var city = $(this).html();
 
-                localStorage.setItem("City " + index, city);
+                // localStorage.setItem("City " + index, city);
 
-                index++;
-                localStorage.setItem("Storage Index", index);
+                // index++;
+                // localStorage.setItem("Storage Index", index);
 
                 // index = index.toString();
                 // console.log("index: " + index + " is integer? " + Number.isInteger(index));
                 // storageIndex++;
 
 
-                var newDiv = $("<p>");
-                newDiv.addClass("city-history-button");
-                newDiv.text(city);
-                $(".city-history").append(newDiv);
+                // var newDiv = $("<p>");
+                // newDiv.addClass("city-history-button");
+                // newDiv.text(city);
+                // $(".city-history").append(newDiv);
 
                 var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
 
@@ -317,15 +327,26 @@
                     method: "GET",
                 }).then(function (response) {
                     console.log(response);
-                    $(".day-1-date").text(response.list[3].dt_txt);
+                    var selection = 3;
+                    for (var i = 0; i < 5; i++) {
+                        i.toString();
+                        console.log("we did it: " + i);
+                        $(".day-" + i + "-date").text(response.list[selection].dt_txt);
+                        $(".day-" + i + "-temp").text("Temperature: " + response.list[selection].main.temp + " F");
+                        $(".day-" + i + "-humidity").text("Humidity: " + response.list[selection].main.humidity + "%");
+                        $(".day-" + i + "-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[selection].weather[0].icon + "@2x.png");
+                        selection = selection + 8;
+                        console.log("day-" + i + "-date")
+                    }
+                    // $(".day-1-date").text(response.list[3].dt_txt);
 
-                    console.log("icon: " + response.list[0].weather[0].icon);
+                    // console.log("icon: " + response.list[3].weather[0].icon);
 
-                    $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
-                    $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
+                    // $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
+                    // $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
 
                     // var imgDiv = $("<img>");
-                    $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
+                    // $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
                     // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
                     // $(".day-1-image").append(imgDiv);
                 });
