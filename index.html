@@ -21,9 +21,19 @@
     }
 
     .city-history {
-        margin: 10px;
         margin-top: 40px;
-        border-style: solid 1px grey;
+        border: solid 1px grey;
+    }
+
+    .city-history-button {
+        padding: 5px;
+        background-color: lightsteelblue;
+        border-bottom: solid 1px grey;
+        /* border-style: solid 2px grey; */
+        margin: 0px;
+    }
+    .city-history-button:hover {
+        background-color: lightgray;
     }
 
     .forcast-day {
@@ -34,6 +44,9 @@
         border-radius: 25px;
         float: left;
         margin: 2px;
+    }
+    .card {
+        margin-bottom: 30px;
     }
 </style>
 
@@ -72,7 +85,7 @@
 
                 </div>
                 <div class="card card-forcast">
-                    <div class="card-header card-header-forcast">5 Day Forcast
+                    <div class="card-header card-header-forcast"></div>
                         <div class="card-body card-body-forcast">
 
                             <div class="forcast-day day-0">
@@ -111,7 +124,7 @@
                             </div>
 
                         </div>
-                    </div>
+                    
                 </div>
 
             </div>
@@ -127,10 +140,9 @@
         var index = 0;
         $(document).ready(function () {
 
-
             var APIKey = "8dadfc0155258003c4e809e37b47eda7";
             var city;
-            var citiesArray = [];
+            // var citiesArray = [];
 
             var indexForHistory = localStorage.getItem("Storage Index");
 
@@ -226,6 +238,8 @@
                 }).then(function (response) {
                     console.log(response);
 
+                    $(".card-header-forcast").text("5 Day Forcast");
+
                     var selection = 3;
                     for (var i = 0; i < 5; i++) {
                         i.toString();
@@ -243,25 +257,12 @@
                 localStorage.clear();
                 $(".city-history").empty();
                 console.clear();
+                index = 0;
 
             });
             $(".city-history-button").on("click", function () {
                 var city = $(this).html();
 
-                // localStorage.setItem("City " + index, city);
-
-                // index++;
-                // localStorage.setItem("Storage Index", index);
-
-                // index = index.toString();
-                // console.log("index: " + index + " is integer? " + Number.isInteger(index));
-                // storageIndex++;
-
-
-                // var newDiv = $("<p>");
-                // newDiv.addClass("city-history-button");
-                // newDiv.text(city);
-                // $(".city-history").append(newDiv);
 
                 var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + APIKey;
 
