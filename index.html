@@ -145,12 +145,13 @@
             // var citiesArray = [];
 
             var indexForHistory = localStorage.getItem("Storage Index");
+            console.log(indexForHistory);
 
             if (indexForHistory >= 0) {
                 index = index + Number(indexForHistory);
 
                 //loop to set up the tabs
-                for (var i = 0; i <= index; i++) {
+                for (var i = 0; i < index; i++) {
                     // var newDiv = $("<p>");
                     // console.log("toString: " + i);
                     var citySearchHistory = localStorage.getItem("City " + i);
@@ -158,6 +159,7 @@
                     var newDiv = $("<p>");
                     newDiv.text(citySearchHistory);
                     newDiv.addClass("city-history-button");
+                    console.log("created div");
                     $(".city-history").append(newDiv);
                 }
             }
@@ -339,28 +341,12 @@
                         selection = selection + 8;
                         console.log("day-" + i + "-date")
                     }
-                    // $(".day-1-date").text(response.list[3].dt_txt);
-
-                    // console.log("icon: " + response.list[3].weather[0].icon);
-
-                    // $(".day-1-temp").text("Temperature: " + response.list[3].main.temp + " F");
-                    // $(".day-1-humidity").text("Humidity: " + response.list[3].main.humidity + "%");
-
-                    // var imgDiv = $("<img>");
-                    // $(".day-1-image").attr("src", "http://openweathermap.org/img/wn/" + response.list[3].weather[0].icon + "@2x.png");
-                    // <img src="http://openweathermap.org/img/wn/" + response.weather[0].icon + "10d@2x.png">
-                    // $(".day-1-image").append(imgDiv);
+                    
                 });
             });
 
         });
-        // });
-
-    //   // Create CODE HERE to calculate the temperature (converted from Kelvin)
-    //   // Hint: To convert from Kelvin to Fahrenheit: F = (K - 273.15) * 1.80 + 32
-    //   // Create CODE HERE to dump the temperature content into HTML
-
-    // });
+        
     </script>
 </body>
 
